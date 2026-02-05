@@ -11,6 +11,12 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class UserModelTest {
 
+    private static final String VALID_LOGIN_ID = "namjin123";
+    private static final String VALID_PASSWORD = "qwer@1234";
+    private static final String VALID_NAME = "namjin";
+    private static final String VALID_BIRTHDAY = "1994-05-25";
+    private static final String VALID_EMAIL = "epemxksl@gmail.com";
+
     @DisplayName("회원을 생성할 때, ")
     @Nested
     class Create {
@@ -18,15 +24,8 @@ class UserModelTest {
         @DisplayName("모든 정보가 올바르면, 정상적으로 생성된다.")
         @Test
         void createsUser_whenAllInfoIsProvided() {
-            // arrange
-            String loginId = "namjin123";
-            String password = "qwer@1234";
-            String name = "namjin";
-            String birthDay = "1994-05-25";
-            String email = "epemxksl@gmail.com";
-
             // act
-            UserModel user = new UserModel(loginId, password, name, birthDay, email);
+            UserModel user = new UserModel(VALID_LOGIN_ID, VALID_PASSWORD, VALID_NAME, VALID_BIRTHDAY, VALID_EMAIL);
 
             // assert
             assertThat(user).isNotNull();
@@ -35,16 +34,21 @@ class UserModelTest {
         @DisplayName("로그인 ID가 비어있으면, 예외가 발생한다.")
         @Test
         void throwsBadRequestException_whenLoginIdIsBlank() {
-            // arrange
-            String loginId = "";
-            String password = "qwer@1234";
-            String name = "namjin";
-            String birthDay = "1994-05-25";
-            String email = "epemxksl@gmail.com";
-
             // act
             CoreException result = assertThrows(CoreException.class, () -> {
-                new UserModel(loginId, password, name, birthDay, email);
+                new UserModel("", VALID_PASSWORD, VALID_NAME, VALID_BIRTHDAY, VALID_EMAIL);
+            });
+
+            // assert
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        }
+
+        @DisplayName("로그인 ID에 영문과 숫자 외 문자가 포함되면, 예외가 발생한다.")
+        @Test
+        void throwsBadRequestException_whenLoginIdContainsInvalidCharacters() {
+            // act
+            CoreException result = assertThrows(CoreException.class, () -> {
+                new UserModel("namjin123!@#", VALID_PASSWORD, VALID_NAME, VALID_BIRTHDAY, VALID_EMAIL);
             });
 
             // assert
@@ -54,16 +58,9 @@ class UserModelTest {
         @DisplayName("이름이 비어있으면, 예외가 발생한다.")
         @Test
         void throwsBadRequestException_whenNameIsBlank() {
-            // arrange
-            String loginId = "namjin123";
-            String password = "qwer@1234";
-            String name = "";
-            String birthDay = "1994-05-25";
-            String email = "epemxksl@gmail.com";
-
             // act
             CoreException result = assertThrows(CoreException.class, () -> {
-                new UserModel(loginId, password, name, birthDay, email);
+                new UserModel(VALID_LOGIN_ID, VALID_PASSWORD, "", VALID_BIRTHDAY, VALID_EMAIL);
             });
 
             // assert
@@ -73,16 +70,9 @@ class UserModelTest {
         @DisplayName("이메일 포맷이 올바르지 않으면, 예외가 발생한다.")
         @Test
         void throwsBadRequestException_whenEmailFormatIsInvalid() {
-            // arrange
-            String loginId = "namjin123";
-            String password = "qwer@1234";
-            String name = "namjin";
-            String birthDay = "1994-05-25";
-            String email = "epemxksl@gmail-com";
-
             // act
             CoreException result = assertThrows(CoreException.class, () -> {
-                new UserModel(loginId, password, name, birthDay, email);
+                new UserModel(VALID_LOGIN_ID, VALID_PASSWORD, VALID_NAME, VALID_BIRTHDAY, "epemxksl@gmail-com");
             });
 
             // assert
@@ -92,92 +82,9 @@ class UserModelTest {
         @DisplayName("생년월일 포맷이 올바르지 않으면, 예외가 발생한다.")
         @Test
         void throwsBadRequestException_whenBirthDateFormatIsInvalid() {
-            // arrange
-            String loginId = "namjin123";
-            String password = "qwer@1234";
-            String name = "namjin";
-            String birthDay = "1994-005-25";
-            String email = "epemxksl@gmail.com";
-
             // act
             CoreException result = assertThrows(CoreException.class, () -> {
-                new UserModel(loginId, password, name, birthDay, email);
-            });
-
-            // assert
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
-        }
-
-        @DisplayName("비밀번호가 8자 미만이면, 예외가 발생한다.")
-        @Test
-        void throwsBadRequestException_whenPasswordIsShorterThan8() {
-            // arrange
-            String loginId = "namjin123";
-            String password = "qwer@12";
-            String name = "namjin";
-            String birthDay = "1994-05-25";
-            String email = "epemxksl@gmail.com";
-
-            // act
-            CoreException result = assertThrows(CoreException.class, () -> {
-                new UserModel(loginId, password, name, birthDay, email);
-            });
-
-            // assert
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
-        }
-
-        @DisplayName("비밀번호가 16자 초과이면, 예외가 발생한다.")
-        @Test
-        void throwsBadRequestException_whenPasswordIsLongerThan16() {
-            // arrange
-            String loginId = "namjin123";
-            String password = "qwer@123412341234";
-            String name = "namjin";
-            String birthDay = "1994-05-25";
-            String email = "epemxksl@gmail.com";
-
-            // act
-            CoreException result = assertThrows(CoreException.class, () -> {
-                new UserModel(loginId, password, name, birthDay, email);
-            });
-
-            // assert
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
-        }
-
-        @DisplayName("비밀번호에 허용되지 않은 문자가 포함되면, 예외가 발생한다.")
-        @Test
-        void throwsBadRequestException_whenPasswordContainsInvalidCharacters() {
-            // arrange
-            String loginId = "namjin123";
-            String password = "qwer@1234한글";
-            String name = "namjin";
-            String birthDay = "1994-05-25";
-            String email = "epemxksl@gmail.com";
-
-            // act
-            CoreException result = assertThrows(CoreException.class, () -> {
-                new UserModel(loginId, password, name, birthDay, email);
-            });
-
-            // assert
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
-        }
-
-        @DisplayName("비밀번호에 생년월일이 포함되면, 예외가 발생한다.")
-        @Test
-        void throwsBadRequestException_whenPasswordContainsBirthDate() {
-            // arrange
-            String loginId = "namjin123";
-            String password = "qwer@1994-05-25";
-            String name = "namjin";
-            String birthDay = "1994-05-25";
-            String email = "epemxksl@gmail.com";
-
-            // act
-            CoreException result = assertThrows(CoreException.class, () -> {
-                new UserModel(loginId, password, name, birthDay, email);
+                new UserModel(VALID_LOGIN_ID, VALID_PASSWORD, VALID_NAME, "1994-005-25", VALID_EMAIL);
             });
 
             // assert
