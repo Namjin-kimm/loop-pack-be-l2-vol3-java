@@ -105,6 +105,31 @@ class UserModelTest {
             // assert
             assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
         }
+
+        @DisplayName("생년월일이 비어있으면, 예외가 발생한다.")
+        @Test
+        void throwsBadRequestException_whenBirthdayIsBlank() {
+            // act
+            CoreException result = assertThrows(CoreException.class, () -> {
+                new UserModel(VALID_LOGIN_ID, VALID_PASSWORD, VALID_NAME, "", VALID_EMAIL);
+            });
+
+            // assert
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        }
+
+        @DisplayName("생년월일이 null이면, 예외가 발생한다.")
+        @Test
+        void throwsBadRequestException_whenBirthdayIsNull() {
+            // act
+            CoreException result = assertThrows(CoreException.class, () -> {
+                new UserModel(VALID_LOGIN_ID, VALID_PASSWORD, VALID_NAME, null, VALID_EMAIL);
+            });
+
+            // assert
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+        }
+
     }
 
     @DisplayName("비밀번호를 변경할 때, ")
