@@ -68,7 +68,7 @@ class UserServiceIntegrationTest {
                 userService.signup(VALID_LOGIN_ID, "newPw@1234", "신규회원", "1995-05-05", "new@test.com");
             });
 
-            assertThat(result.getErrorType()).isEqualTo(ErrorType.BAD_REQUEST);
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.CONFLICT);
         }
     }
 
