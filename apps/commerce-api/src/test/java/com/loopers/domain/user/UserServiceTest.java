@@ -71,7 +71,6 @@ class UserServiceTest {
         @Test
         void throwsException_whenLoginIdAlreadyExists() {
             // arrange
-            // stub: existsByLoginId 호출하면 true 반환 (이미 존재하는 회원)
             when(userRepository.existsByLoginId(VALID_LOGIN_ID))
                     .thenReturn(true);
 
@@ -225,6 +224,8 @@ class UserServiceTest {
 
             when(userRepository.findByLoginId(VALID_LOGIN_ID))
                     .thenReturn(Optional.of(user));
+            // currentPassword == newPassword == VALID_PASSWORD 이므로,
+            // 1차 호출(현재 비밀번호 확인)과 2차 호출(새 비밀번호 == 현재 비밀번호 확인) 모두 이 stub에 매칭된다
             when(passwordEncoder.matches(VALID_PASSWORD, VALID_ENCRYPTED_PASSWORD))
                     .thenReturn(true);
 
