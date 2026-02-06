@@ -1,6 +1,7 @@
 package com.loopers.interfaces.api;
 
 import com.loopers.interfaces.api.user.UserV1Dto;
+import com.loopers.support.error.ErrorType;
 import com.loopers.utils.DatabaseCleanUp;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
@@ -101,7 +102,7 @@ class UserV1ApiE2ETest {
 
             // assert
             assertAll(
-                () -> assertTrue(response.getStatusCode().is4xxClientError()),
+                () -> assertThat(response.getStatusCode()).isEqualTo(HttpStatus.CONFLICT),
                 () -> assertThat(response.getBody().meta().result()).isEqualTo(ApiResponse.Metadata.Result.FAIL)
             );
         }
@@ -147,7 +148,8 @@ class UserV1ApiE2ETest {
             // act
             ParameterizedTypeReference<ApiResponse<UserV1Dto.UserResponse>> responseType = new ParameterizedTypeReference<>() {};
             ResponseEntity<ApiResponse<UserV1Dto.UserResponse>> response =
-                testRestTemplate.exchange(ME_ENDPOINT, HttpMethod.GET, null, responseType);
+                    // httpEntity로 null을 전달하면 본문 및 헤더 둘 다 없다는 의미이기 때문에 빈 HttpEntity를 전달하자.
+                testRestTemplate.exchange(ME_ENDPOINT, HttpMethod.GET, HttpEntity.EMPTY, responseType);
 
             // assert
             assertAll(
