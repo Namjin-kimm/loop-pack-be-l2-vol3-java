@@ -5,6 +5,7 @@ import com.loopers.support.error.ErrorType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
@@ -15,6 +16,7 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     // 회원가입
+    @Transactional
     public UserModel signup(String loginId, String password, String name, String birthday, String email) {
         // 1. 비밀번호 검증 (암호화 전 raw password)
         Password.validate(password, birthday);
@@ -34,6 +36,7 @@ public class UserService {
     }
 
     // 인증
+    @Transactional(readOnly = true)
     public UserModel authenticate(String loginId, String password) {
         UserModel user = userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CoreException(ErrorType.UNAUTHORIZED, "회원 정보가 올바르지 않습니다."));
@@ -46,6 +49,7 @@ public class UserService {
     }
 
     // 비밀번호 변경
+    @Transactional
     public void changePassword(String loginId, String currentPassword, String newPassword) {
         // 1. 사용자 조회
         UserModel user = userRepository.findByLoginId(loginId)
@@ -71,6 +75,7 @@ public class UserService {
     }
 
     // 로그인 ID로 조회
+    @Transactional(readOnly = true)
     public UserModel findByLoginId(String loginId) {
         return userRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CoreException(ErrorType.NOT_FOUND, "존재하지 않는 사용자입니다."));
