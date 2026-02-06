@@ -61,6 +61,9 @@ class AuthInterceptorTest {
             HttpServletRequest request = mock(HttpServletRequest.class);
             HttpServletResponse response = mock(HttpServletResponse.class);
 
+            when(request.getRequestURI()).thenReturn("/api/v1/users/me");
+            when(request.getRemoteAddr()).thenReturn("127.0.0.1");
+
             // act & assert
             CoreException result = assertThrows(CoreException.class, () -> {
                 authInterceptor.preHandle(request, response, new Object());
@@ -79,6 +82,7 @@ class AuthInterceptorTest {
 
             when(request.getHeader(HEADER_LOGIN_ID)).thenReturn(VALID_LOGIN_ID);
             when(request.getHeader(HEADER_LOGIN_PW)).thenReturn("wrongPassword");
+            when(request.getRequestURI()).thenReturn("/api/v1/users/me");
 
             when(userService.authenticate(VALID_LOGIN_ID, "wrongPassword"))
                     .thenThrow(new CoreException(ErrorType.UNAUTHORIZED, "회원 정보가 올바르지 않습니다."));
@@ -89,6 +93,25 @@ class AuthInterceptorTest {
             });
 
             assertThat(result.getErrorType()).isEqualTo(ErrorType.UNAUTHORIZED);
+        }
+
+        @DisplayName("빈 문자열 인증 헤더로 요청하면, 예외가 발생한다.")
+        @Test
+        void throwsException_whenHeadersAreBlank() {
+            // arrange
+            HttpServletRequest request = mock(HttpServletRequest.class);
+            HttpServletResponse response = mock(HttpServletResponse.class);
+
+            when(request.getHeader(HEADER_LOGIN_ID)).thenReturn("   ");
+            when(request.getHeader(HEADER_LOGIN_PW)).thenReturn("");
+
+            // act & assert
+            CoreException result = assertThrows(CoreException.class, () -> {
+                authInterceptor.preHandle(request, response, new Object());
+            });
+
+            assertThat(result.getErrorType()).isEqualTo(ErrorType.UNAUTHORIZED);
+            verify(userService, never()).authenticate(any(), any());
         }
     }
 }
