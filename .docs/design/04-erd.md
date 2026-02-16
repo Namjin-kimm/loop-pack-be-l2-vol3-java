@@ -1,33 +1,5 @@
 # ERD
 
-## 공통 사항
-
-### BaseEntity 컬럼
-
-soft delete 정책 엔티티(brand, product, orders, order_item)는 아래 4개 컬럼을 공통으로 가진다.
-
-| 컬럼 | 타입 | 제약 | 설명 |
-|------|------|------|------|
-| id | BIGINT | PK, AUTO_INCREMENT | 고유 식별자 |
-| created_at | DATETIME | NOT NULL | 생성 시각 (UTC) |
-| updated_at | DATETIME | NOT NULL | 최종 수정 시각 (UTC) |
-| deleted_at | DATETIME | nullable | soft delete 마커. NULL이면 활성 상태 |
-
-hard delete 정책 엔티티(likes, cart_item)는 `id`와 `created_at`만 자체 보유한다.
-
-### 컬럼 컨벤션
-
-- 네이밍: snake_case (Spring Boot 기본 네이밍 전략)
-- 타임존: UTC 저장 (`hibernate.timezone.default_storage: NORMALIZE_UTC`)
-- FK 컬럼: `{참조 대상}_id` (예: `brand_id`, `user_id`)
-- VO 매핑: `@Embedded`로 VO의 내부 값을 컬럼으로 펼친다 (예: Money.amount → `price`, Stock.quantity → `stock`)
-
-### FK 정책
-
-- 본 ERD에서 "FK"로 표기된 컬럼은 **논리적 참조**를 의미한다. DB에 물리적 `FOREIGN KEY` 제약은 생성하지 않는다.
-- 클래스 다이어그램에서 `@ManyToOne`이 아닌 `Long brandId`처럼 ID 값으로 느슨하게 참조하는 설계와 일치한다.
-- 참조 무결성은 애플리케이션 레벨에서 보장한다: Facade가 존재 확인 → 저장 순서를 조율하고, 삭제 시 종속 데이터를 먼저 정리한다 (시퀀스 다이어그램 US-B06, US-P07 참고).
-
 ---
 
 ## 전체 ERD
